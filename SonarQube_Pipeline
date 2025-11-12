@@ -1,0 +1,38 @@
+# Publish code to SonarQube through Jenkins
+# Install sonarqube scanner plugin
+# Configure this plugin
+# Jenkins → Manage Jenkins → Configure System → SonarQube → Add SonarQube Instance
+# Provide Name → sonar9
+# Authentication Token → get this from sonarqube (go to the sonarqube dashboard - click on my account - security - Generate token)
+# Jenkins → Manage Jenkins → Credentials → Secret text → enter above token → enter id → description → save 
+# SonarQube URL (use private Ip)
+# Write Jenkins Job to publish the code to SonarQube
+
+pipeline {
+    agent any
+
+    stages {
+        stage("Git") {
+            steps {
+              git branch: "main", url: "https://github.com/Tangala123/first-mvn"
+            }
+        }
+        stage("Sonar") {
+            steps {
+                withSonarQubeEnv('sonar9') { 
+                    sh "mvn sonar:sonar"
+                }
+            }
+        }
+        stage("sonarquality"){
+            steps{
+                script{ 
+                    def qg = waitForQualityGate()
+                    if (qg.status != 'ok'){
+                        error "status failed"
+                    }
+                } 
+            }
+        }
+    }
+}
