@@ -1,0 +1,32 @@
+# In jenkins do following configurations
+Jenkins → Manage Jenkins → Configure System → “Global Pipeline Libraries” → Add
+
+@Library("jhc_lib") _
+pipeline {
+    agent any
+
+    stages {
+        stage('Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/Tangala123/first-mvn'
+            }
+        }
+        stage("Build") {
+            steps {
+                sh "mvn clean package"
+            }
+        }
+        stage ("Groovy") {
+            steps {
+               add(4,5)
+               multiply(2,4)
+               tomcatDeploy("172.31.25.185", "tomcat-deploy", "ec2-user")
+            }
+        }
+       stage ("Groovy") {
+            steps {
+               nexusUpload('maven_project','project','in.javahome')
+            }
+        }
+    }
+}
